@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Independent Analysis — Evidence-Based Research Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ── Variables ──────────────────────────────────────────────────────── */
+    :root {
+      --bg:       #0A0E14;
+      --surface:  #111722;
+      --border:   #1E2D42;
+      --gold:     #C8A84B;
+      --gold-dim: #7A6330;
+      --red:      #C94040;
+      --green:    #3D9970;
+      --blue:     #2E6DA4;
+      --text:     #D4DCE8;
+      --muted:    #5A7090;
+      --white:    #F0F4F8;
+      --mono:     'IBM Plex Mono', monospace;
+      --serif:    'Playfair Display', Georgia, serif;
+      --sans:     'IBM Plex Sans', sans-serif;
+    }
+
+    /* ── Reset ──────────────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 15px;
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── Noise texture overlay ──────────────────────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.5;
+    }
+
+    /* ── Masthead ────────────────────────────────────────────────────────── */
+    .masthead {
+      position: relative;
+      border-bottom: 1px solid var(--border);
+      padding: 0 3rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+      z-index: 10;
+    }
+    .masthead::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--gold) 0%, transparent 60%);
+    }
+    .masthead-brand {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .masthead-mark {
+      width: 32px; height: 32px;
+      border: 2px solid var(--gold);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--gold);
+      letter-spacing: 0.05em;
+    }
+    .masthead-title {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+    .masthead-meta {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+    }
+
+    /* ── Hero ────────────────────────────────────────────────────────────── */
+    .hero {
+      position: relative;
+      padding: 6rem 3rem 4rem;
+      max-width: 1100px;
+      margin: 0 auto;
+      z-index: 1;
+    }
+    .hero-eyebrow {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.25em;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .hero-eyebrow::before {
+      content: '';
+      display: block;
+      width: 32px; height: 1px;
+      background: var(--gold);
+    }
+    .hero-heading {
+      font-family: var(--serif);
+      font-size: clamp(2.4rem, 5vw, 4.2rem);
+      font-weight: 900;
+      line-height: 1.1;
+      color: var(--white);
+      margin-bottom: 1.5rem;
+      max-width: 700px;
+    }
+    .hero-heading em {
+      font-style: italic;
+      color: var(--gold);
+    }
+    .hero-sub {
+      font-size: 16px;
+      color: var(--muted);
+      max-width: 560px;
+      line-height: 1.7;
+      font-weight: 300;
+    }
+    .hero-rule {
+      margin: 3rem 0 0;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ── Main grid ───────────────────────────────────────────────────────── */
+    .main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 3rem 6rem;
+      z-index: 1;
+      position: relative;
+    }
+
+    /* ── Section header ──────────────────────────────────────────────────── */
+    .section-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.25em;
+      color: var(--muted);
+      text-transform: uppercase;
+      padding: 3rem 0 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ── Analysis card ───────────────────────────────────────────────────── */
+    .analysis-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      margin-bottom: 2px;
+      position: relative;
+      transition: border-color 0.2s;
+      animation: fadeUp 0.5s ease both;
+    }
+    .analysis-card:hover { border-color: var(--gold-dim); }
+    .analysis-card::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: var(--gold);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .analysis-card:hover::before { opacity: 1; }
+
+    .card-header {
+      padding: 2rem 2.5rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: start;
+      gap: 1rem;
+    }
+    .card-tag {
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.6rem;
+    }
+    .card-title {
+      font-family: var(--serif);
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--white);
+      line-height: 1.2;
+      margin-bottom: 0.5rem;
+    }
+    .card-subtitle {
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 300;
+    }
+    .card-verdict {
+      text-align: right;
+    }
+    .verdict-label {
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 0.15em;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 0.3rem;
+    }
+    .verdict-badge {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      padding: 0.35rem 0.75rem;
+      border: 1px solid;
+    }
+    .verdict-badge.negative { color: var(--red); border-color: var(--red); }
+    .verdict-badge.mixed    { color: #C8A84B; border-color: #C8A84B; }
+    .verdict-badge.positive { color: var(--green); border-color: var(--green); }
+
+    /* ── Tabs ────────────────────────────────────────────────────────────── */
+    .card-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+    }
+    .tab-btn {
+      background: none;
+      border: none;
+      padding: 0.85rem 1.6rem;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .tab-btn:hover { color: var(--text); }
+    .tab-btn.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+    .tab-panel { display: none; padding: 2rem 2.5rem; }
+    .tab-panel.active { display: block; }
+
+    /* ── Summary text ────────────────────────────────────────────────────── */
+    .summary-text {
+      font-size: 14px;
+      line-height: 1.8;
+      color: var(--text);
+      font-weight: 300;
+    }
+    .summary-text p { margin-bottom: 1rem; }
+    .summary-text p:last-child { margin-bottom: 0; }
+    .summary-text strong { color: var(--white); font-weight: 500; }
+    .summary-text .highlight {
+      color: var(--gold);
+      font-family: var(--mono);
+      font-size: 13px;
+    }
+
+    /* ── Verdict grid ────────────────────────────────────────────────────── */
+    .verdict-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 1px;
+      background: var(--border);
+      margin-bottom: 1.5rem;
+    }
+    .verdict-cell {
+      background: var(--bg);
+      padding: 1.2rem 1.4rem;
+    }
+    .verdict-cell-label {
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+    .verdict-cell-label.risk    { color: var(--red); }
+    .verdict-cell-label.central { color: #C8A84B; }
+    .verdict-cell-label.opp     { color: var(--green); }
+    .verdict-cell-value {
+      font-size: 13px;
+      color: var(--text);
+      font-weight: 300;
+      line-height: 1.5;
+    }
+
+    /* ── Downloads ───────────────────────────────────────────────────────── */
+    .downloads-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--border);
+    }
+    .download-item {
+      background: var(--bg);
+      padding: 1.5rem 1.8rem;
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+      text-decoration: none;
+      transition: background 0.15s;
+    }
+    .download-item:hover { background: var(--surface); }
+    .download-icon {
+      width: 40px; height: 40px;
+      border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      font-size: 16px;
+    }
+    .download-info { flex: 1; }
+    .download-name {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--white);
+      margin-bottom: 0.2rem;
+    }
+    .download-meta {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+    }
+    .download-arrow {
+      font-size: 18px;
+      color: var(--muted);
+      transition: color 0.15s, transform 0.15s;
+    }
+    .download-item:hover .download-arrow {
+      color: var(--gold);
+      transform: translateX(3px);
+    }
+
+    /* ── Prompt panel ────────────────────────────────────────────────────── */
+    .prompt-block {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      padding: 1.5rem;
+      position: relative;
+    }
+    .prompt-block::before {
+      content: 'SYSTEM PROMPT';
+      position: absolute;
+      top: -1px; left: 1.2rem;
+      background: var(--bg);
+      padding: 0 0.5rem;
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 0.2em;
+      color: var(--muted);
+      transform: translateY(-50%);
+    }
+    .prompt-text {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      line-height: 1.7;
+      color: #7A9ABF;
+      white-space: pre-wrap;
+      max-height: 340px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+    .prompt-text::-webkit-scrollbar { width: 4px; }
+    .prompt-text::-webkit-scrollbar-track { background: transparent; }
+    .prompt-text::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    /* ── Future placeholder ──────────────────────────────────────────────── */
+    .future-card {
+      border: 1px dashed var(--border);
+      padding: 3rem 2.5rem;
+      text-align: center;
+      margin-bottom: 2px;
+      transition: border-color 0.2s;
+    }
+    .future-card:hover { border-color: var(--gold-dim); }
+    .future-icon {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      opacity: 0.3;
+    }
+    .future-title {
+      font-family: var(--serif);
+      font-size: 1.1rem;
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+    }
+    .future-sub {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      color: var(--border);
+      text-transform: uppercase;
+    }
+
+    /* ── Footer ──────────────────────────────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem 3rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      z-index: 1;
+    }
+    .footer-note {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+    }
+    .footer-disclaimer {
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 300;
+      max-width: 500px;
+      text-align: right;
+    }
+
+    /* ── Animations ──────────────────────────────────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .hero { animation: fadeUp 0.6s ease both; }
+    .analysis-card:nth-child(1) { animation-delay: 0.1s; }
+    .analysis-card:nth-child(2) { animation-delay: 0.2s; }
+
+    /* ── Responsive ──────────────────────────────────────────────────────── */
+    @media (max-width: 700px) {
+      .hero, .main { padding-left: 1.2rem; padding-right: 1.2rem; }
+      .masthead { padding: 0 1.2rem; }
+      .card-header { grid-template-columns: 1fr; }
+      .card-verdict { text-align: left; }
+      .verdict-grid { grid-template-columns: 1fr; }
+      .downloads-grid { grid-template-columns: 1fr; }
+      footer { flex-direction: column; gap: 1rem; }
+      .footer-disclaimer { text-align: left; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ── Masthead ──────────────────────────────────────────────────────────── -->
+  <header class="masthead">
+    <div class="masthead-brand">
+      <div class="masthead-mark">IA</div>
+      <span class="masthead-title">Independent Analysis</span>
+    </div>
+    <span class="masthead-meta">Evidence-Based Research Portal</span>
+  </header>
+
+  <!-- ── Hero ──────────────────────────────────────────────────────────────── -->
+  <section class="hero">
+    <div class="hero-eyebrow">Research Portal</div>
+    <h1 class="hero-heading">
+      Rigorous analysis.<br/>
+      <em>No agenda.</em>
+    </h1>
+    <p class="hero-sub">
+      Independent, evidence-based assessments of complex economic and policy questions.
+      Each analysis is structured around credible data sources, scenario modelling,
+      and explicit confidence levels — distinguishing evidence from speculation.
+    </p>
+    <div class="hero-rule"></div>
+  </section>
+
+  <!-- ── Main ──────────────────────────────────────────────────────────────── -->
+  <main class="main">
+
+    <div class="section-label">Published Analyses</div>
+
+    <!-- ── ANALYSIS 1: Scottish Independence ─────────────────────────────── -->
+    <article class="analysis-card" id="scottish-independence">
+
+      <div class="card-header">
+        <div>
+          <div class="card-tag">Economics · Constitutional · Policy</div>
+          <h2 class="card-title">Scottish Independence</h2>
+          <p class="card-subtitle">Economic Impact Assessment — Second Edition &nbsp;·&nbsp; April 2026</p>
+        </div>
+        <div class="card-verdict">
+          <div class="verdict-label">Net Forecast</div>
+          <span class="verdict-badge negative">Net Negative (Near-term)</span>
+        </div>
+      </div>
+
+      <div class="card-tabs">
+        <button class="tab-btn active" onclick="switchTab(this, 'summary-1')">Summary</button>
+        <button class="tab-btn" onclick="switchTab(this, 'downloads-1')">Documents</button>
+        <button class="tab-btn" onclick="switchTab(this, 'prompt-1')">Research Prompt</button>
+      </div>
+
+      <!-- Summary tab -->
+      <div id="summary-1" class="tab-panel active">
+        <div class="verdict-grid">
+          <div class="verdict-cell">
+            <div class="verdict-cell-label risk">⚠ Key Risks</div>
+            <div class="verdict-cell-value">Structural fiscal deficit of £8–17bn from day one. ~60% of exports exposed to rUK border friction. Financial services relocation risk is high and likely partly irreversible.</div>
+          </div>
+          <div class="verdict-cell">
+            <div class="verdict-cell-label central">≈ Base Case</div>
+            <div class="verdict-cell-value">GDP −3% to −8% in years 1–5. Gradual recovery from year 5. Broadly neutral at year 10 <em>if</em> EU access is secured. High uncertainty throughout.</div>
+          </div>
+          <div class="verdict-cell">
+            <div class="verdict-cell-label opp">✦ Opportunities</div>
+            <div class="verdict-cell-value">EU single market (450m consumers), largest per-capita renewable energy resource in Europe, full policy autonomy, £0.8–1.8bn/yr in potential defence savings.</div>
+          </div>
+        </div>
+
+        <div class="summary-text">
+          <p>Scotland faces a genuinely complex economic calculus. The analysis — spanning 15 sections and drawing on ONS, GERS, IFS, OBR, and IMF data — finds that the economic case for independence is neither straightforwardly strong nor straightforwardly weak.</p>
+
+          <p><strong>The near-term picture is clearly negative.</strong> The structural fiscal deficit (~9–10% of GDP on a GERS basis), the dominance of rUK trade (~60% of exports), financial sector relocation risk, currency uncertainty, and one-off transition costs of £4.5–9.7bn all materialise simultaneously — before any offsetting benefits from EU membership or policy autonomy can compound.</p>
+
+          <p><strong>The long-term picture is uncertain but plausible.</strong> Comparable independent economies — Ireland, Denmark, Norway, Finland — demonstrate that viability at Scotland's scale is achievable. Scotland's renewable energy resource base is a genuine structural advantage. The steel-man analysis finds the pro-independence economic case is coherent over a 20-year horizon under favourable conditions.</p>
+
+          <p><span class="highlight">Analytical verdict:</span> A high-variance proposition. Near-term costs are certain and front-loaded; long-term gains are real but contingent on policy choices, negotiation outcomes, and governance quality that cannot be determined in advance. The outcome depends more on <strong>how</strong> independence is implemented than on independence itself.</p>
+        </div>
+      </div>
+
+      <!-- Downloads tab -->
+      <div id="downloads-1" class="tab-panel">
+        <div class="downloads-grid">
+          <a class="download-item" href="Scottish_Independence_Economic_Analysis_v2.docx" download>
+            <div class="download-icon">📄</div>
+            <div class="download-info">
+              <div class="download-name">Full Analysis — Second Edition</div>
+              <div class="download-meta">Word Document &nbsp;·&nbsp; 15 Sections &nbsp;·&nbsp; ~8,000 words</div>
+            </div>
+            <span class="download-arrow">→</span>
+          </a>
+          <a class="download-item" href="Scottish_Independence_Summary_Slide.pptx" download>
+            <div class="download-icon">📊</div>
+            <div class="download-info">
+              <div class="download-name">Summary Presentation</div>
+              <div class="download-meta">PowerPoint &nbsp;·&nbsp; 1 Slide &nbsp;·&nbsp; Key Risks / Base Case / Opportunities</div>
+            </div>
+            <span class="download-arrow">→</span>
+          </a>
+
+        </div>
+      </div>
+
+      <!-- Prompt tab -->
+      <div id="prompt-1" class="tab-panel">
+        <div class="prompt-block">
+          <pre class="prompt-text">You are an independent economic research analyst tasked with producing a balanced, evidence-based assessment of the potential economic impacts of Scottish independence.
+
+Your analysis must be neutral, rigorous, and grounded in credible data sources (e.g., UK ONS, Scottish Government publications, IFS, Fraser of Allander Institute, academic research, OECD, IMF where relevant).
+
+STRUCTURE YOUR RESPONSE AS FOLLOWS:
+
+1. EXECUTIVE SUMMARY (max 300 words)
+   - Provide a concise, balanced overview of the key economic opportunities and risks
+   - Clearly state areas of high uncertainty vs high confidence
+
+2. BASELINE CONTEXT
+   - Current structure of Scotland's economy (GDP, key sectors, trade flows)
+   - Fiscal position (revenues vs spending, including GERS-style analysis)
+   - Relationship with the rest of the UK (rUK) economically
+
+3. KEY ECONOMIC DIMENSIONS OF INDEPENDENCE
+   Analyse each of the following areas in a balanced way, outlining both potential
+   benefits and risks: Trade & Borders, Currency & Monetary Policy, Fiscal Position,
+   Investment & Business Environment, Energy & Natural Resources, Labour Market
+   & Migration, Financial Services, Public Services.
+
+4. SECTOR-BY-SECTOR IMPACT ANALYSIS
+   For each major sector, assess likely positive and negative impacts across three
+   time horizons: Short-term (0–3 yrs), Medium-term (3–10 yrs), Long-term (10+ yrs).
+
+5. SCENARIO ANALYSIS
+   Develop at least three plausible scenarios: Optimistic, Central/Base Case,
+   Pessimistic. For each include GDP impact, employment effects, public finance
+   stability.
+
+6. TRANSITION COSTS & PRACTICAL IMPLEMENTATION
+
+7. COMPARABLE COUNTRY CASE STUDIES (Ireland, Denmark, Norway, Finland)
+
+8. KEY UNCERTAINTIES & ASSUMPTIONS
+
+9. BALANCED CONCLUSION
+
+10. FINAL SUMMARY TABLE
+    Area | Likely Positive Impact | Likely Negative Impact | Confidence Level
+
+STYLE REQUIREMENTS:
+- Be neutral and analytical, not political
+- Clearly distinguish evidence from speculation
+- Use ranges and scenarios rather than precise forecasts
+- Avoid emotive language
+- Where possible, cite or reference known studies or institutions</pre>
+        </div>
+        <p style="margin-top:1.2rem; font-size:12px; color:var(--muted); font-family:var(--mono);">
+          The second edition was subsequently expanded following peer review feedback, adding sections on Defence &amp; Security Economics, Fiscal Repair Modelling, EU Accession Assessment, Household-Level Impacts, Renewable Revenue Realism, and a Steel-Man analysis of pro-independence economic arguments.
+        </p>
+      </div>
+
+    </article>
+
+    <!-- ── Future placeholders ────────────────────────────────────────────── -->
+    <div class="section-label" style="margin-top:2.5rem;">Forthcoming</div>
+
+    <div class="future-card">
+      <div class="future-icon">◎</div>
+      <div class="future-title">Next analysis pending</div>
+      <div class="future-sub">Submissions open &nbsp;·&nbsp; Economics · Policy · Technology · Finance</div>
+    </div>
+
+    <div class="future-card">
+      <div class="future-icon">◎</div>
+      <div class="future-title">Research queue</div>
+      <div class="future-sub">Add your topic &nbsp;·&nbsp; Evidence-based methodology applied</div>
+    </div>
+
+  </main>
+
+  <!-- ── Footer ─────────────────────────────────────────────────────────────── -->
+  <footer>
+    <span class="footer-note">Independent Analysis Portal &nbsp;·&nbsp; v1.0 &nbsp;·&nbsp; 2026</span>
+    <p class="footer-disclaimer">All analyses are produced for informational and educational purposes only. They do not constitute financial, legal, or political advice. Sources cited throughout.</p>
+  </footer>
+
+  <script>
+    function switchTab(btn, panelId) {
+      // Find card
+      const card = btn.closest('.analysis-card');
+
+      // Deactivate all tabs and panels in this card
+      card.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      card.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+
+      // Activate selected
+      btn.classList.add('active');
+      document.getElementById(panelId).classList.add('active');
+    }
+  </script>
+
+</body>
+</html>
